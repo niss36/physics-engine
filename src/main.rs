@@ -31,6 +31,7 @@ async fn main() {
         clear_background(WHITE);
 
         render_world(&world);
+        draw_text(format!("{} FPS", get_fps()).as_str(), 10., 10., 16., RED);
 
         world.tick(instant.elapsed());
         instant = Instant::now();
