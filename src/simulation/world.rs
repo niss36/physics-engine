@@ -2,6 +2,7 @@ use super::collisions::*;
 use crate::body::*;
 use crate::vec2::*;
 
+use rand::{thread_rng, Rng};
 use std::time::Duration;
 
 #[derive(Debug)]
@@ -11,37 +12,51 @@ pub struct World {
 }
 
 impl World {
-    pub fn new_populated(width: f64, height: f64, offset: f64) -> Self {
+    pub fn new_populated(width: f64, height: f64, offset: f64, num_bodies: u32) -> Self {
         let top_border = Line::new(UNIT_DOWN, -offset);
         let right_border = Line::new(UNIT_LEFT, width - 1. - offset);
         let bottom_border = Line::new(UNIT_UP, height - 1. - offset);
         let left_border = Line::new(UNIT_RIGHT, -offset);
 
+        let mut rng = thread_rng();
+
+        let mut bodies: Vec<_> = [top_border, right_border, bottom_border, left_border]
+            .into_iter()
+            .map(|line| Body::Line(line))
+            .collect();
+
+        let circles = (0..num_bodies).map(|_| {
+            let position_x = rng.gen_range(offset..=width - offset);
+            let position_y = rng.gen_range(offset..=height - offset);
+
+            let velocity_x = rng.gen::<f64>() - 0.5;
+            let velocity_y = rng.gen::<f64>() - 0.5;
+
+            let coefficient_of_restitution = rng.gen();
+
+            let mass = rng.gen::<f64>() + 0.000001;
+
+            Body::Circle(Circle {
+                body: BaseBody {
+                    position: Vec2D {
+                        x: position_x,
+                        y: position_y,
+                    },
+                    velocity: Vec2D {
+                        x: velocity_x,
+                        y: velocity_y,
+                    },
+                    coefficient_of_restitution,
+                    inverse_mass: 1.0 / mass,
+                },
+                radius: 100. * mass,
+            })
+        });
+
+        bodies.extend(circles);
+
         Self {
-            bodies: vec![
-                Body::Line(top_border),
-                Body::Line(right_border),
-                Body::Line(bottom_border),
-                Body::Line(left_border),
-                Body::Circle(Circle {
-                    body: BaseBody {
-                        position: Vec2D { x: 100., y: 100. },
-                        velocity: Vec2D { x: 70., y: 50. },
-                        coefficient_of_restitution: 0.,
-                        inverse_mass: 1.,
-                    },
-                    radius: 50.,
-                }),
-                Body::Circle(Circle {
-                    body: BaseBody {
-                        position: Vec2D { x: 200., y: 200. },
-                        velocity: Vec2D { x: -10., y: -10. },
-                        coefficient_of_restitution: 0.,
-                        inverse_mass: 1.,
-                    },
-                    radius: 50.,
-                }),
-            ],
+            bodies,
             gravity: Vec2D { x: 0., y: 10. },
         }
     }

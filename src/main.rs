@@ -24,7 +24,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut world = World::new_populated(WINDOW_WIDTH as f64, WINDOW_HEIGHT as f64, 10.);
+    let mut world = World::new_populated(WINDOW_WIDTH as f64, WINDOW_HEIGHT as f64, 10., 100);
     let mut instant = Instant::now();
 
     loop {
