@@ -5,7 +5,7 @@ use crate::vec2::*;
 use rand::{thread_rng, Rng};
 use std::time::Duration;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct World {
     pub bodies: Vec<Body>,
     pub gravity: Vec2D,

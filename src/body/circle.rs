@@ -1,6 +1,6 @@
 use super::BaseBody;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Circle {
     pub body: BaseBody,
     pub radius: f64,

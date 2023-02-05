@@ -1,7 +1,7 @@
 use crate::vec2::Vec2D;
 use std::time::Duration;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct BaseBody {
     pub position: Vec2D,
     pub velocity: Vec2D,

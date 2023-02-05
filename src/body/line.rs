@@ -1,7 +1,7 @@
 use super::BaseBody;
 use crate::vec2::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Line {
     pub body: BaseBody,
     pub normal: Vec2D,

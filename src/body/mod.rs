@@ -6,7 +6,7 @@ pub use base::*;
 pub use circle::*;
 pub use line::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Body {
     Circle(Circle),
     Line(Line),
