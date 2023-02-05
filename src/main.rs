@@ -1,10 +1,4 @@
-mod body;
-mod rendering;
-mod simulation;
-mod vec2;
-
-use rendering::*;
-use simulation::world::World;
+use physics_engine::{rendering::*, simulation::world::World};
 
 use macroquad::prelude::*;
 use std::time::Instant;

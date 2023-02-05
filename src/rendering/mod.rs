@@ -1,5 +1,5 @@
 use crate::body::*;
-use crate::World;
+use crate::simulation::world::World;
 
 use macroquad::prelude::*;
 
