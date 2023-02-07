@@ -31,7 +31,7 @@ pub fn render_world(world: &World) {
                     let y1 = a0 * x1 + b0;
                     let y2 = a0 * x2 + b0;
 
-                    draw_line(x1, y1, x2, y2, 1., BLACK)
+                    draw_line(x1, y1, x2, y2, 1., BLACK);
                 } else {
                     let c0 = (-c / a) as f32;
 
