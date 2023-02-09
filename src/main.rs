@@ -20,7 +20,7 @@ const TIME_BETWEEN_TICKS: Duration = Duration::from_millis(10);
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut world = World::new_populated(WINDOW_WIDTH as f64, WINDOW_HEIGHT as f64, 10., 100);
+    let mut world = World::new_populated(WINDOW_WIDTH as f64, WINDOW_HEIGHT as f64, 10., 1000);
     let mut last_frame = Instant::now();
     let mut accumulator = Duration::default();
 
@@ -33,7 +33,7 @@ async fn main() {
 
         let mut ticks_per_frame = 0;
 
-        while accumulator >= TIME_BETWEEN_TICKS {
+        while accumulator >= TIME_BETWEEN_TICKS && ticks_per_frame < 5 {
             accumulator -= TIME_BETWEEN_TICKS;
 
             let before_tick = Instant::now();

@@ -49,7 +49,7 @@ impl World {
                     coefficient_of_restitution,
                     inverse_mass: 1.0 / mass,
                 },
-                radius: 100. * mass,
+                radius: 10. * mass,
             })
         });
 
@@ -57,16 +57,21 @@ impl World {
 
         Self {
             bodies,
-            gravity: Vec2D { x: 0., y: 10. },
+            gravity: Vec2D { x: 0., y: 100. },
         }
     }
 
     fn apply_gravity(&mut self, elapsed: &Duration) {
-        for body in self.bodies.iter_mut() {
-            let base_body = body.as_mut();
-            if base_body.inverse_mass > 0. {
-                base_body.velocity += &(&self.gravity * elapsed.as_secs_f64());
-            }
+        let gravity = &self.gravity * elapsed.as_secs_f64();
+
+        let bodies_with_mass = self
+            .bodies
+            .iter_mut()
+            .map(Body::as_mut)
+            .filter(|body| body.inverse_mass > 0.);
+
+        for body in bodies_with_mass {
+            body.velocity += &gravity;
         }
     }
 
@@ -77,24 +82,30 @@ impl World {
             let this = &mut head[i];
 
             for that in tail {
-                if let Some(contact) = generate_contact(this, that) {
-                    let this_body = this.as_mut();
-                    let that_body = that.as_mut();
+                if fast_collision_check(this, that) {
+                    if let Some(contact) = generate_contact(this, that) {
+                        if contact.distance >= 0. {
+                            continue;
+                        }
 
-                    let relative_velocity = &that_body.velocity - &this_body.velocity;
-                    let relative_velocity_dot_normal =
-                        relative_velocity.dot_product(&contact.normal);
+                        let this_body = this.as_mut();
+                        let that_body = that.as_mut();
 
-                    let to_remove = relative_velocity_dot_normal
-                        + 0.4
-                        + (contact.distance + 1.) / elapsed.as_secs_f64();
+                        let relative_velocity = &that_body.velocity - &this_body.velocity;
+                        let relative_velocity_dot_normal =
+                            relative_velocity.dot_product(&contact.normal);
 
-                    if to_remove < 0. && contact.distance < 0. {
-                        let impulse = &contact.normal
-                            * (to_remove / (this_body.inverse_mass + that_body.inverse_mass));
+                        let to_remove = relative_velocity_dot_normal
+                            + 0.4
+                            + (contact.distance + 1.) / elapsed.as_secs_f64();
 
-                        this_body.velocity += &(&impulse * this_body.inverse_mass);
-                        that_body.velocity -= &(&impulse * that_body.inverse_mass);
+                        if to_remove < 0. {
+                            let impulse = &contact.normal
+                                * (to_remove / (this_body.inverse_mass + that_body.inverse_mass));
+
+                            this_body.velocity += &(&impulse * this_body.inverse_mass);
+                            that_body.velocity -= &(&impulse * that_body.inverse_mass);
+                        }
                     }
                 }
             }
@@ -111,5 +122,21 @@ impl World {
         self.apply_gravity(&elapsed);
         self.handle_collisions(&elapsed);
         self.integrate_bodies(&elapsed);
+    }
+}
+
+fn fast_collision_check(this: &Body, that: &Body) -> bool {
+    use Body::*;
+
+    match (this, that) {
+        (Circle(this), Circle(that)) => {
+            let normal = &that.body.position - &this.body.position;
+
+            return normal.dot_product(&normal)
+                < (this.radius + that.radius) * (this.radius + that.radius);
+        }
+        (Circle(_), Line(_)) => true,
+        (Line(_), Circle(_)) => true,
+        (Line(_), Line(_)) => false,
     }
 }

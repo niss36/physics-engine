@@ -20,8 +20,8 @@ pub fn generate_contact(this: &Body, that: &Body) -> Option<Contact> {
 
     match (this, that) {
         (Circle(this), Circle(that)) => Some(contacts::circle_circle(this, that)),
-        (Circle(this), Line(that)) => Some(contacts::circle_line(this, that)),
-        (Line(this), Circle(that)) => Some(contacts::circle_line(that, this).flip()),
+        (Circle(this), Line(that)) => Some(contacts::line_circle(that, this).flip()),
+        (Line(this), Circle(that)) => Some(contacts::line_circle(this, that)),
         (Line(_), Line(_)) => None,
     }
 }
@@ -33,7 +33,7 @@ mod contacts {
         let normal = &that.body.position - &this.body.position;
         let length = normal.length();
 
-        let distance = normal.length() - (this.radius + that.radius);
+        let distance = length - (this.radius + that.radius);
 
         Contact {
             normal: &normal / length,
@@ -41,12 +41,12 @@ mod contacts {
         }
     }
 
-    pub fn circle_line(this: &Circle, that: &Line) -> Contact {
+    pub fn line_circle(this: &Line, that: &Circle) -> Contact {
         let distance =
-            that.normal.dot_product(&this.body.position) + that.origin_distance - this.radius;
+            this.normal.dot_product(&that.body.position) + this.origin_distance - that.radius;
 
         Contact {
-            normal: -that.normal,
+            normal: this.normal,
             distance,
         }
     }
