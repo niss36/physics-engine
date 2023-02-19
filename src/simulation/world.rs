@@ -2,7 +2,7 @@ use super::collisions::*;
 use crate::body::*;
 use crate::vec2::*;
 
-use rand::{thread_rng, Rng};
+use macroquad::rand::gen_range;
 use std::time::Duration;
 
 #[derive(Debug, Clone)]
@@ -18,23 +18,21 @@ impl World {
         let bottom_border = Line::new(UNIT_UP, height - 1. - offset);
         let left_border = Line::new(UNIT_RIGHT, -offset);
 
-        let mut rng = thread_rng();
-
         let mut bodies: Vec<_> = [top_border, right_border, bottom_border, left_border]
             .into_iter()
             .map(|line| Body::Line(line))
             .collect();
 
         let circles = (0..num_bodies).map(|_| {
-            let position_x = rng.gen_range(offset..=width - offset);
-            let position_y = rng.gen_range(offset..=height - offset);
+            let position_x = gen_range(offset, width - offset);
+            let position_y = gen_range(offset, height - offset);
 
-            let velocity_x = rng.gen::<f64>() - 0.5;
-            let velocity_y = rng.gen::<f64>() - 0.5;
+            let velocity_x = gen_range(-0.5, 0.5);
+            let velocity_y = gen_range(-0.5, 0.5);
 
-            let coefficient_of_restitution = rng.gen();
+            let coefficient_of_restitution = gen_range(0., 1.);
 
-            let mass = rng.gen::<f64>() + 0.000001;
+            let mass = gen_range(0., 1.) + 0.000001;
 
             Body::Circle(Circle {
                 body: BaseBody {
