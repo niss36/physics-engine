@@ -1,10 +1,12 @@
 pub mod base;
 pub mod circle;
 pub mod line;
+pub mod rectangle;
 
 pub use base::*;
 pub use circle::*;
 pub use line::*;
+pub use rectangle::*;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Body {
