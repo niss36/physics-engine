@@ -25,4 +25,11 @@ impl Vec2D {
             y: self.y.abs(),
         }
     }
+
+    pub fn clamp(&self, min: &Vec2D, max: &Vec2D) -> Vec2D {
+        Vec2D {
+            x: self.x.clamp(min.x, max.x),
+            y: self.y.clamp(min.y, max.y),
+        }
+    }
 }
