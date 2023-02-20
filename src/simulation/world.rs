@@ -122,19 +122,3 @@ impl World {
         self.integrate_bodies(&elapsed);
     }
 }
-
-fn fast_collision_check(this: &Body, that: &Body) -> bool {
-    use Body::*;
-
-    match (this, that) {
-        (Circle(this), Circle(that)) => {
-            let normal = &that.body.position - &this.body.position;
-
-            return normal.dot_product(&normal)
-                < (this.radius + that.radius) * (this.radius + that.radius);
-        }
-        (Circle(_), Line(_)) => true,
-        (Line(_), Circle(_)) => true,
-        (Line(_), Line(_)) => false,
-    }
-}
