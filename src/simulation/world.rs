@@ -80,32 +80,7 @@ impl World {
             let this = &mut head[i];
 
             for that in tail {
-                if fast_collision_check(this, that) {
-                    if let Some(contact) = generate_contact(this, that) {
-                        if contact.distance >= 0. {
-                            continue;
-                        }
-
-                        let this_body = this.as_mut();
-                        let that_body = that.as_mut();
-
-                        let relative_velocity = &that_body.velocity - &this_body.velocity;
-                        let relative_velocity_dot_normal =
-                            relative_velocity.dot_product(&contact.normal);
-
-                        let to_remove = relative_velocity_dot_normal
-                            + 0.4
-                            + (contact.distance + 1.) / elapsed.as_secs_f64();
-
-                        if to_remove < 0. {
-                            let impulse = &contact.normal
-                                * (to_remove / (this_body.inverse_mass + that_body.inverse_mass));
-
-                            this_body.velocity += &(&impulse * this_body.inverse_mass);
-                            that_body.velocity -= &(&impulse * that_body.inverse_mass);
-                        }
-                    }
-                }
+                handle_collision(this, that, elapsed);
             }
         }
     }
@@ -121,4 +96,34 @@ impl World {
         self.handle_collisions(&elapsed);
         self.integrate_bodies(&elapsed);
     }
+}
+
+fn handle_collision(this: &mut Body, that: &mut Body, elapsed: &Duration) {
+    if !fast_collision_check(this, that) {
+        return;
+    }
+
+    let Some(contact) = generate_contact(this, that) else { return };
+
+    if contact.distance >= 0. {
+        return;
+    }
+
+    let this_body = this.as_mut();
+    let that_body = that.as_mut();
+
+    let relative_velocity = &that_body.velocity - &this_body.velocity;
+    let relative_velocity_dot_normal = relative_velocity.dot_product(&contact.normal);
+
+    let to_remove =
+        relative_velocity_dot_normal + 0.4 + (contact.distance + 1.) / elapsed.as_secs_f64();
+
+    if to_remove >= 0. {
+        return;
+    }
+
+    let impulse = &contact.normal * (to_remove / (this_body.inverse_mass + that_body.inverse_mass));
+
+    this_body.velocity += &(&impulse * this_body.inverse_mass);
+    that_body.velocity -= &(&impulse * that_body.inverse_mass);
 }
