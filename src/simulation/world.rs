@@ -113,6 +113,8 @@ fn handle_collision(this: &mut Body, that: &mut Body) {
     let that_body = that.as_mut();
 
     apply_impulse(this_body, that_body, &contact);
+
+    apply_correction(this_body, that_body, &contact);
 }
 
 fn apply_impulse(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &Contact) {
@@ -135,4 +137,18 @@ fn apply_impulse(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &C
 
     this_body.velocity += &(&impulse * this_body.inverse_mass);
     that_body.velocity -= &(&impulse * that_body.inverse_mass);
+}
+
+const CORRECTION_THRESHOLD: f64 = 0.05;
+const CORRECTION_PERCENTAGE: f64 = 0.2;
+
+fn apply_correction(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &Contact) {
+    let correction_amount = (contact.distance + CORRECTION_THRESHOLD).min(0.)
+        * CORRECTION_PERCENTAGE
+        / (this_body.inverse_mass + that_body.inverse_mass);
+
+    let correction = &contact.normal * correction_amount;
+
+    this_body.position += &(&correction * this_body.inverse_mass);
+    that_body.position -= &(&correction * that_body.inverse_mass);
 }
