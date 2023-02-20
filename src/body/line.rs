@@ -14,7 +14,7 @@ impl Line {
             body: BaseBody {
                 position: &normal * (-origin_distance / normal.length()),
                 velocity: ZERO,
-                coefficient_of_restitution: 0.,
+                coefficient_of_restitution: 1.,
                 inverse_mass: 0.,
             },
             normal,
