@@ -48,8 +48,8 @@ pub fn generate_contact(this: &Body, that: &Body) -> Option<Contact> {
         (Rectangle(this), Circle(that)) => None,    // todo
         (Circle(this), Line(that)) => Some(contacts::line_circle(that, this).flip()),
         (Line(this), Circle(that)) => Some(contacts::line_circle(this, that)),
-        (Rectangle(this), Line(that)) => None, // todo
-        (Line(this), Rectangle(that)) => None, // todo
+        (Rectangle(this), Line(that)) => Some(contacts::line_rectangle(that, this).flip()),
+        (Line(this), Rectangle(that)) => Some(contacts::line_rectangle(this, that)),
         (Line(_), Line(_)) => None,
     }
 }
@@ -72,6 +72,40 @@ mod contacts {
     pub fn line_circle(this: &Line, that: &Circle) -> Contact {
         let distance =
             this.normal.dot_product(&that.body.position) + this.origin_distance - that.radius;
+
+        Contact {
+            normal: this.normal,
+            distance,
+        }
+    }
+
+    pub fn line_rectangle(this: &Line, that: &Rectangle) -> Contact {
+        let offsets = [
+            Vec2D {
+                x: that.half_width,
+                y: that.half_height,
+            },
+            Vec2D {
+                x: that.half_width,
+                y: -that.half_height,
+            },
+            Vec2D {
+                x: -that.half_width,
+                y: -that.half_height,
+            },
+            Vec2D {
+                x: -that.half_width,
+                y: that.half_height,
+            },
+        ];
+
+        let distances = offsets.into_iter().map(|offset| {
+            let point = &that.body.position + &offset;
+            this.normal.dot_product(&point) + this.origin_distance
+        });
+
+        // Safe because there are always 4 elements
+        let distance = distances.reduce(f64::min).unwrap();
 
         Contact {
             normal: this.normal,
