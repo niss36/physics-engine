@@ -6,10 +6,12 @@ pub fn fast_collision_check(this: &Body, that: &Body) -> bool {
 
     match (this, that) {
         (Circle(this), Circle(that)) => {
-            let normal = &that.body.position - &this.body.position;
+            let this_to_that = &that.body.position - &this.body.position;
 
-            return normal.dot_product(&normal)
-                < (this.radius + that.radius) * (this.radius + that.radius);
+            let square_distance = this_to_that.length_squared();
+            let square_total_radius = (this.radius + that.radius).powi(2);
+
+            return square_distance < square_total_radius;
         }
         (Circle(_), Line(_)) => true,
         (Line(_), Circle(_)) => true,
@@ -46,13 +48,13 @@ mod contacts {
     use super::*;
 
     pub fn circle_circle(this: &Circle, that: &Circle) -> Contact {
-        let normal = &that.body.position - &this.body.position;
-        let length = normal.length();
+        let this_to_that = &that.body.position - &this.body.position;
+        let length = this_to_that.length();
 
         let distance = length - (this.radius + that.radius);
 
         Contact {
-            normal: &normal / length,
+            normal: &this_to_that / length,
             distance,
         }
     }

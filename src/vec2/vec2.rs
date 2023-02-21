@@ -15,6 +15,10 @@ impl Vec2D {
         self.x * other.x + self.y * other.y
     }
 
+    pub fn length_squared(&self) -> f64 {
+        self.x * self.x + self.y * self.y
+    }
+
     pub fn length(&self) -> f64 {
         (self.x * self.x + self.y * self.y).sqrt()
     }
