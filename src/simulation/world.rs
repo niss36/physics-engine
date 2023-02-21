@@ -47,11 +47,47 @@ impl World {
                     coefficient_of_restitution,
                     inverse_mass: 1.0 / mass,
                 },
-                radius: 10. * mass,
+                radius: 100. * mass,
             })
         });
 
         bodies.extend(circles);
+
+        let rectangles = (0..num_bodies).map(|_| {
+            let position_x = gen_range(offset, width - offset);
+            let position_y = gen_range(offset, height - offset);
+
+            let velocity_x = gen_range(-25., 25.);
+            let velocity_y = gen_range(-25., 25.);
+
+            let coefficient_of_restitution = gen_range(0., 1.);
+
+            let mass = gen_range(0., 1.) + 0.000001;
+
+            let aspect_ratio = gen_range(0., 1.);
+
+            let half_width = aspect_ratio * 100. * mass;
+            let half_height = (1. - aspect_ratio) * 100. * mass;
+
+            Body::Rectangle(Rectangle {
+                body: BaseBody {
+                    position: Vec2D {
+                        x: position_x,
+                        y: position_y,
+                    },
+                    velocity: Vec2D {
+                        x: velocity_x,
+                        y: velocity_y,
+                    },
+                    coefficient_of_restitution,
+                    inverse_mass: 1.0 / mass,
+                },
+                half_width,
+                half_height,
+            })
+        });
+
+        bodies.extend(rectangles);
 
         Self {
             bodies,
@@ -140,7 +176,7 @@ fn apply_impulse(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &C
 }
 
 const CORRECTION_THRESHOLD: f64 = 0.05;
-const CORRECTION_PERCENTAGE: f64 = 0.2;
+const CORRECTION_PERCENTAGE: f64 = 0.4;
 
 fn apply_correction(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &Contact) {
     let correction_amount = (contact.distance + CORRECTION_THRESHOLD).min(0.)
