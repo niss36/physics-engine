@@ -43,7 +43,7 @@ pub fn generate_contact(this: &Body, that: &Body) -> Option<Contact> {
 
     match (this, that) {
         (Circle(this), Circle(that)) => Some(contacts::circle_circle(this, that)),
-        (Rectangle(this), Rectangle(that)) => None, // todo
+        (Rectangle(this), Rectangle(that)) => contacts::rectangle_rectangle(this, that),
         (Circle(this), Rectangle(that)) => Some(contacts::circle_rectangle(this, that)),
         (Rectangle(this), Circle(that)) => Some(contacts::circle_rectangle(that, this).flip()),
         (Circle(this), Line(that)) => Some(contacts::line_circle(that, this).flip()),
@@ -66,6 +66,41 @@ mod contacts {
         Contact {
             normal: &this_to_that / length,
             distance,
+        }
+    }
+
+    pub fn rectangle_rectangle(this: &Rectangle, that: &Rectangle) -> Option<Contact> {
+        let displacement = &that.body.position - &this.body.position;
+
+        let x_overlap = this.half_width + that.half_width - displacement.x.abs();
+        let y_overlap = this.half_height + that.half_height - displacement.y.abs();
+
+        if x_overlap <= 0. || y_overlap <= 0. {
+            return None;
+        }
+
+        if x_overlap < y_overlap {
+            let normal = if displacement.x < 0. {
+                UNIT_LEFT
+            } else {
+                UNIT_RIGHT
+            };
+
+            Some(Contact {
+                normal,
+                distance: -x_overlap,
+            })
+        } else {
+            let normal = if displacement.y < 0. {
+                UNIT_UP
+            } else {
+                UNIT_DOWN
+            };
+
+            Some(Contact {
+                normal,
+                distance: -y_overlap,
+            })
         }
     }
 
