@@ -13,8 +13,13 @@ pub fn fast_collision_check(this: &Body, that: &Body) -> bool {
 
             return square_distance < square_total_radius;
         }
+        (Rectangle(_), Rectangle(_)) => true, // todo
+        (Circle(_), Rectangle(_)) => true,    // todo
+        (Rectangle(_), Circle(_)) => true,    // todo
         (Circle(_), Line(_)) => true,
         (Line(_), Circle(_)) => true,
+        (Rectangle(_), Line(_)) => true,
+        (Line(_), Rectangle(_)) => true,
         (Line(_), Line(_)) => false,
     }
 }
@@ -38,8 +43,13 @@ pub fn generate_contact(this: &Body, that: &Body) -> Option<Contact> {
 
     match (this, that) {
         (Circle(this), Circle(that)) => Some(contacts::circle_circle(this, that)),
+        (Rectangle(this), Rectangle(that)) => None, // todo
+        (Circle(this), Rectangle(that)) => None,    // todo
+        (Rectangle(this), Circle(that)) => None,    // todo
         (Circle(this), Line(that)) => Some(contacts::line_circle(that, this).flip()),
         (Line(this), Circle(that)) => Some(contacts::line_circle(this, that)),
+        (Rectangle(this), Line(that)) => None, // todo
+        (Line(this), Rectangle(that)) => None, // todo
         (Line(_), Line(_)) => None,
     }
 }

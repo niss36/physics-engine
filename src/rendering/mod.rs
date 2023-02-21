@@ -41,6 +41,15 @@ pub fn render_world(world: &World) {
                     draw_line(c0, y1, c0, y2, 1., BLACK);
                 }
             }
+            Body::Rectangle(rectangle) => {
+                let x = (rectangle.body.position.x - rectangle.half_width) as f32;
+                let y = (rectangle.body.position.y - rectangle.half_height) as f32;
+
+                let width = (rectangle.half_width * 2.) as f32;
+                let height = (rectangle.half_height * 2.) as f32;
+
+                draw_rectangle(x, y, width, height, BLACK)
+            }
         }
     }
 }

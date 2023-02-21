@@ -12,6 +12,7 @@ pub use rectangle::*;
 pub enum Body {
     Circle(Circle),
     Line(Line),
+    Rectangle(Rectangle),
 }
 
 impl AsRef<BaseBody> for Body {
@@ -19,6 +20,7 @@ impl AsRef<BaseBody> for Body {
         match self {
             Self::Circle(circle) => circle.as_ref(),
             Self::Line(line) => line.as_ref(),
+            Self::Rectangle(rectangle) => rectangle.as_ref(),
         }
     }
 }
@@ -28,6 +30,7 @@ impl AsMut<BaseBody> for Body {
         match self {
             Self::Circle(circle) => circle.as_mut(),
             Self::Line(line) => line.as_mut(),
+            Self::Rectangle(rectangle) => rectangle.as_mut(),
         }
     }
 }
