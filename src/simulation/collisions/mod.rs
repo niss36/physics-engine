@@ -44,8 +44,8 @@ pub fn generate_contact(this: &Body, that: &Body) -> Option<Contact> {
     match (this, that) {
         (Circle(this), Circle(that)) => Some(contacts::circle_circle(this, that)),
         (Rectangle(this), Rectangle(that)) => None, // todo
-        (Circle(this), Rectangle(that)) => None,    // todo
-        (Rectangle(this), Circle(that)) => None,    // todo
+        (Circle(this), Rectangle(that)) => Some(contacts::circle_rectangle(this, that)),
+        (Rectangle(this), Circle(that)) => Some(contacts::circle_rectangle(that, this).flip()),
         (Circle(this), Line(that)) => Some(contacts::line_circle(that, this).flip()),
         (Line(this), Circle(that)) => Some(contacts::line_circle(this, that)),
         (Rectangle(this), Line(that)) => Some(contacts::line_rectangle(that, this).flip()),
@@ -66,6 +66,56 @@ mod contacts {
         Contact {
             normal: &this_to_that / length,
             distance,
+        }
+    }
+
+    pub fn circle_rectangle(this: &Circle, that: &Rectangle) -> Contact {
+        let displacement = &that.body.position - &this.body.position;
+
+        let clamped_displacement = displacement.clamp(
+            &Vec2D {
+                x: -that.half_width,
+                y: -that.half_height,
+            },
+            &Vec2D {
+                x: that.half_width,
+                y: that.half_height,
+            },
+        );
+
+        let is_inside = clamped_displacement == displacement;
+
+        let closest_point = if is_inside {
+            if displacement.x.abs() > displacement.y.abs() {
+                Vec2D {
+                    x: clamped_displacement.x.signum() * that.half_width,
+                    y: clamped_displacement.y,
+                }
+            } else {
+                Vec2D {
+                    x: clamped_displacement.x,
+                    y: clamped_displacement.y.signum() * that.half_height,
+                }
+            }
+        } else {
+            clamped_displacement
+        };
+
+        let normal = &displacement - &closest_point;
+        let length = normal.length();
+
+        let distance = length - this.radius;
+
+        if is_inside {
+            Contact {
+                normal: &normal / length,
+                distance,
+            }
+        } else {
+            Contact {
+                normal: &normal / length,
+                distance,
+            }
         }
     }
 
