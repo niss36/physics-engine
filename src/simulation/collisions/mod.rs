@@ -13,9 +13,21 @@ pub fn fast_collision_check(this: &Body, that: &Body) -> bool {
 
             return square_distance < square_total_radius;
         }
-        (Rectangle(_), Rectangle(_)) => true, // todo
-        (Circle(_), Rectangle(_)) => true,    // todo
-        (Rectangle(_), Circle(_)) => true,    // todo
+        (Rectangle(this), Rectangle(that)) => {
+            let (this_min_x, this_max_x, this_min_y, this_max_y) = this.get_min_max();
+            let (that_min_x, that_max_x, that_min_y, that_max_y) = that.get_min_max();
+
+            if this_max_x < that_min_x || this_min_x > that_max_x {
+                return false;
+            }
+            if this_max_y < that_min_y || this_min_y > that_max_y {
+                return false;
+            }
+
+            true
+        }
+        (Circle(_), Rectangle(_)) => true, // todo
+        (Rectangle(_), Circle(_)) => true, // todo
         (Circle(_), Line(_)) => true,
         (Line(_), Circle(_)) => true,
         (Rectangle(_), Line(_)) => true,
