@@ -64,7 +64,7 @@ impl World {
 
             let mass = gen_range(0., 1.) + 0.000001;
 
-            let aspect_ratio = gen_range(0., 1.);
+            let aspect_ratio = gen_range(0.25, 0.75);
 
             let half_width = aspect_ratio * 100. * mass;
             let half_height = (1. - aspect_ratio) * 100. * mass;
