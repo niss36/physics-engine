@@ -155,7 +155,7 @@ mod contacts {
 
         if is_inside {
             Contact {
-                normal: &normal / length,
+                normal: -(&normal / length),
                 distance,
             }
         } else {
