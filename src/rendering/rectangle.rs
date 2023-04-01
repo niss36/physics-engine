@@ -7,5 +7,5 @@ pub fn render_rectangle(rectangle: &crate::body::Rectangle) {
     let width = (rectangle.half_width * 2.) as f32;
     let height = (rectangle.half_height * 2.) as f32;
 
-    draw_rectangle(x, y, width, height, BLACK);
+    draw_rectangle_lines(x, y, width, height, 1., BLACK);
 }
