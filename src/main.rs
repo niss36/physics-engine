@@ -1,4 +1,4 @@
-use physics_engine::{rendering::*, simulation::world::World};
+use physics_engine::{rendering::*, simulation::world::World, vec2::Vec2D};
 
 use macroquad::prelude::*;
 use std::time::{Duration, Instant};
@@ -18,9 +18,13 @@ fn window_conf() -> Conf {
 
 const TIME_BETWEEN_TICKS: Duration = Duration::from_millis(10);
 
+fn generate_world() -> World {
+    World::generate(screen_width() as f64, screen_height() as f64, 10., 500)
+}
+
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut world = World::generate(screen_width() as f64, screen_height() as f64, 10., 100);
+    let mut world = generate_world();
     let mut last_frame = Instant::now();
     let mut accumulator = Duration::default();
 
@@ -28,6 +32,51 @@ async fn main() {
     let mut n_tick = 0;
 
     loop {
+        if is_key_released(KeyCode::R) {
+            world = generate_world();
+            last_frame = Instant::now();
+            accumulator = Duration::default();
+
+            average_tick = Duration::default();
+            n_tick = 0;
+        }
+
+        if is_key_released(KeyCode::Key1) {
+            world.gravity = Vec2D { x: 0., y: -100. };
+        }
+
+        if is_key_released(KeyCode::Key2) {
+            world.gravity = Vec2D { x: 100., y: -100. };
+        }
+
+        if is_key_released(KeyCode::Key3) {
+            world.gravity = Vec2D { x: 100., y: 0. };
+        }
+
+        if is_key_released(KeyCode::Key4) {
+            world.gravity = Vec2D { x: 100., y: 100. };
+        }
+
+        if is_key_released(KeyCode::Key5) {
+            world.gravity = Vec2D { x: 0., y: 100. };
+        }
+
+        if is_key_released(KeyCode::Key6) {
+            world.gravity = Vec2D { x: -100., y: 100. };
+        }
+
+        if is_key_released(KeyCode::Key7) {
+            world.gravity = Vec2D { x: -100., y: 0. };
+        }
+
+        if is_key_released(KeyCode::Key8) {
+            world.gravity = Vec2D { x: -100., y: -100. };
+        }
+
+        if is_key_released(KeyCode::Key0) {
+            world.gravity = Vec2D { x: 0., y: 0. };
+        }
+
         accumulator += last_frame.elapsed();
         last_frame = Instant::now();
 
