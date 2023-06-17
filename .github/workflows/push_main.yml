@@ -18,6 +18,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
 
       - name: Install packages (Linux)
         if: runner.os == 'Linux'
@@ -28,11 +29,11 @@ jobs:
       - name: cargo fmt
         run: cargo fmt --all --check
 
-      - name: cargo clippy
-        run: cargo clippy --all-targets -- -D warnings
-
       - name: cargo build
         run: cargo build --verbose
+
+      - name: cargo clippy
+        run: cargo clippy --all-targets -- -D warnings
 
       - name: cargo test
         run: cargo test --verbose
