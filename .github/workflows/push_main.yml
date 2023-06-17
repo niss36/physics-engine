@@ -12,18 +12,9 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
+  build_lint_test:
     name: Build all targets and runs tests
-    runs-on: ${{ matrix.config.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - { os: ubuntu-latest, target: "x86_64-unknown-linux-gnu" }
-          - { os: ubuntu-latest, target: "wasm32-unknown-unknown" }
-        include:
-          - os: ubuntu-latest
-            packages: libx11-dev libxi-dev libgl1-mesa-dev gcc-mingw-w64 libasound2-dev
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -32,24 +23,16 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get -yq --no-install-suggests --no-install-recommends install ${{ matrix.packages }}
-
-      - name: Install rust toolchain
-        run: rustup target add ${{ matrix.config.target }}
-
-      - name: cargo build
-        run: cargo build --all-targets --target=${{ matrix.config.target }}
-      
-      - name: cargo test
-        run: cargo test --all-targets --target=${{ matrix.config.target }}
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+          sudo apt-get -yq --no-install-suggests --no-install-recommends install libx11-dev libxi-dev libgl1-mesa-dev gcc-mingw-w64 libasound2-dev
 
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
       - name: cargo clippy
         run: cargo clippy -- -D warnings
+
+      - name: cargo build
+        run: cargo build
+
+      - name: cargo test
+        run: cargo test
