@@ -13,7 +13,8 @@ env:
 
 jobs:
   build_lint_test:
-    name: Build all targets and runs tests
+    name: Build, lint and test
+
     runs-on: ubuntu-latest
 
     steps:
@@ -37,3 +38,41 @@ jobs:
 
       - name: cargo test
         run: cargo test --verbose
+
+  deploy_gh_pages:
+    name: Deploy to GitHub Pages
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install WASM toolchain
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Build WASM binary
+        run: cargo build --target wasm32-unknown-unknown --release
+
+      - name: Copy static files
+        run: |
+          mkdir $SITE_DIR
+          cp target/wasm32-unknown-unknown/release/physics-engine.wasm $SITE_DIR/physics-engine.wasm
+          cp wasm.html $SITE_DIR/wasm.html
+        env:
+          SITE_DIR: _site
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v1
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
