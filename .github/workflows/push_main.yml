@@ -26,13 +26,13 @@ jobs:
           sudo apt-get -yq --no-install-suggests --no-install-recommends install libx11-dev libxi-dev libgl1-mesa-dev gcc-mingw-w64 libasound2-dev
 
       - name: cargo fmt
-        run: cargo fmt --all -- --check
+        run: cargo fmt --all --check
 
       - name: cargo clippy
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --all-targets -- -D warnings
 
       - name: cargo build
-        run: cargo build
+        run: cargo build --verbose
 
       - name: cargo test
-        run: cargo test
+        run: cargo test --verbose
