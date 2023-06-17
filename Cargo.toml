@@ -11,6 +11,9 @@ macroquad = "0.3"
 [dev-dependencies]
 criterion = "0.4.0"
 
+[profile.release]
+lto = true
+
 [[bench]]
 name = "collisions"
 harness = false
