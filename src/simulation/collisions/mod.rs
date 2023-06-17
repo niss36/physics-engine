@@ -11,7 +11,7 @@ pub fn fast_collision_check(this: &Body, that: &Body) -> bool {
             let square_distance = this_to_that.length_squared();
             let square_total_radius = (this.radius + that.radius).powi(2);
 
-            return square_distance < square_total_radius;
+            square_distance < square_total_radius
         }
         (Rectangle(this), Rectangle(that)) => {
             let (this_min_x, this_max_x, this_min_y, this_max_y) = this.get_min_max();

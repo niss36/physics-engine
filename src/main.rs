@@ -100,7 +100,7 @@ async fn main() {
         render_world(&world);
         draw_text(format!("{} FPS", get_fps()).as_str(), 10., 10., 16., RED);
         draw_text(
-            format!("{} ticks per frame", ticks_per_frame).as_str(),
+            format!("{ticks_per_frame} ticks per frame").as_str(),
             10.,
             30.,
             16.,

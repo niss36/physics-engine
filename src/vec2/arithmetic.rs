@@ -1,4 +1,4 @@
-use super::vec2::Vec2D;
+use super::Vec2D;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 impl<'a, 'b> Add<&'b Vec2D> for &'a Vec2D {

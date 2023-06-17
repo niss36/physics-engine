@@ -72,7 +72,7 @@ impl World {
 
         let mut bodies: Vec<_> = [top_border, right_border, bottom_border, left_border]
             .into_iter()
-            .map(|line| Body::Line(line))
+            .map(Body::Line)
             .collect();
 
         let circles = (0..num_bodies).map(|_| Body::Circle(random_circle(width, height, offset)));
