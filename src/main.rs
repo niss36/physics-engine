@@ -1,7 +1,6 @@
 use physics_engine::{rendering::*, simulation::world::World, vec2::Vec2D};
 
 use macroquad::prelude::*;
-use std::time::{Duration, Instant};
 
 const WINDOW_WIDTH: i32 = 1920;
 const WINDOW_HEIGHT: i32 = 1080;
@@ -16,7 +15,7 @@ fn window_conf() -> Conf {
     }
 }
 
-const TIME_BETWEEN_TICKS: Duration = Duration::from_millis(10);
+const TIME_BETWEEN_TICKS: f32 = 10. / 1_000.;
 
 fn generate_world() -> World {
     World::generate(screen_width() as f64, screen_height() as f64, 10., 500)
@@ -25,19 +24,17 @@ fn generate_world() -> World {
 #[macroquad::main(window_conf)]
 async fn main() {
     let mut world = generate_world();
-    let mut last_frame = Instant::now();
-    let mut accumulator = Duration::default();
+    let mut accumulator = 0.;
 
-    let mut average_tick = Duration::default();
+    let mut average_tick = 0.;
     let mut n_tick = 0;
 
     loop {
         if is_key_released(KeyCode::R) {
             world = generate_world();
-            last_frame = Instant::now();
-            accumulator = Duration::default();
+            accumulator = 0.;
 
-            average_tick = Duration::default();
+            average_tick = 0.;
             n_tick = 0;
         }
 
@@ -77,19 +74,18 @@ async fn main() {
             world.gravity = Vec2D { x: 0., y: 0. };
         }
 
-        accumulator += last_frame.elapsed();
-        last_frame = Instant::now();
+        accumulator += get_frame_time();
 
         let mut ticks_per_frame = 0;
 
         while accumulator >= TIME_BETWEEN_TICKS && ticks_per_frame < 5 {
             accumulator -= TIME_BETWEEN_TICKS;
 
-            let before_tick = Instant::now();
-            world.tick(TIME_BETWEEN_TICKS);
-            let elapsed_tick = before_tick.elapsed();
+            let before_tick = get_time();
+            world.tick(TIME_BETWEEN_TICKS as f64);
+            let elapsed_tick = get_time() - before_tick;
 
-            average_tick = (elapsed_tick + n_tick * average_tick) / (n_tick + 1);
+            average_tick = (elapsed_tick + (n_tick as f64) * average_tick) / ((n_tick + 1) as f64);
             n_tick += 1;
 
             ticks_per_frame += 1;
@@ -107,7 +103,7 @@ async fn main() {
             RED,
         );
         draw_text(
-            format!("{} ns tick", average_tick.as_nanos()).as_str(),
+            format!("{:.0} ns tick", average_tick * 1_000_000_000.).as_str(),
             10.,
             50.,
             16.,

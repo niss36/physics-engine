@@ -4,8 +4,6 @@ use super::collisions::*;
 use crate::body::*;
 use crate::vec2::*;
 
-use std::time::Duration;
-
 #[derive(Debug, Clone)]
 pub struct World {
     pub bodies: Vec<Body>,
@@ -13,8 +11,8 @@ pub struct World {
 }
 
 impl World {
-    fn apply_gravity(&mut self, elapsed: &Duration) {
-        let gravity = &self.gravity * elapsed.as_secs_f64();
+    fn apply_gravity(&mut self, elapsed: f64) {
+        let gravity = &self.gravity * elapsed;
 
         let bodies_with_mass = self
             .bodies
@@ -39,16 +37,16 @@ impl World {
         }
     }
 
-    fn integrate_bodies(&mut self, elapsed: &Duration) {
+    fn integrate_bodies(&mut self, elapsed: f64) {
         for body in self.bodies.iter_mut() {
             body.as_mut().integrate(elapsed);
         }
     }
 
-    pub fn tick(&mut self, elapsed: Duration) {
-        self.apply_gravity(&elapsed);
+    pub fn tick(&mut self, elapsed: f64) {
+        self.apply_gravity(elapsed);
         self.handle_collisions();
-        self.integrate_bodies(&elapsed);
+        self.integrate_bodies(elapsed);
     }
 }
 

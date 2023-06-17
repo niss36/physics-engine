@@ -1,5 +1,4 @@
 use crate::vec2::Vec2D;
-use std::time::Duration;
 
 #[derive(Debug, Clone, Copy)]
 pub struct BaseBody {
@@ -10,7 +9,7 @@ pub struct BaseBody {
 }
 
 impl BaseBody {
-    pub fn integrate(&mut self, elapsed: &Duration) {
-        self.position += &(&self.velocity * elapsed.as_secs_f64());
+    pub fn integrate(&mut self, elapsed: f64) {
+        self.position += &(&self.velocity * elapsed);
     }
 }
