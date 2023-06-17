@@ -12,7 +12,7 @@ fn generate_contact_benchmark(c: &mut Criterion) {
     circle_to_line_not_colliding_benchmark(&mut group);
 }
 
-fn circle_to_circle_colliding_benchmark<'a, M: Measurement>(group: &mut BenchmarkGroup<'a, M>) {
+fn circle_to_circle_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
     let circle_1 = Body::Circle(Circle {
         body: BaseBody {
             position: ZERO,
@@ -36,11 +36,11 @@ fn circle_to_circle_colliding_benchmark<'a, M: Measurement>(group: &mut Benchmar
     group.bench_with_input(
         "circle to circle (colliding)",
         &(circle_1, circle_2),
-        |b, (circle_1, circle_2)| b.iter(|| generate_contact(&circle_1, &circle_2)),
+        |b, (circle_1, circle_2)| b.iter(|| generate_contact(circle_1, circle_2)),
     );
 }
 
-fn circle_to_circle_not_colliding_benchmark<'a, M: Measurement>(group: &mut BenchmarkGroup<'a, M>) {
+fn circle_to_circle_not_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
     let circle_1 = Body::Circle(Circle {
         body: BaseBody {
             position: ZERO,
@@ -64,11 +64,11 @@ fn circle_to_circle_not_colliding_benchmark<'a, M: Measurement>(group: &mut Benc
     group.bench_with_input(
         "circle to circle (not colliding)",
         &(circle_1, circle_2),
-        |b, (circle_1, circle_2)| b.iter(|| generate_contact(&circle_1, &circle_2)),
+        |b, (circle_1, circle_2)| b.iter(|| generate_contact(circle_1, circle_2)),
     );
 }
 
-fn circle_to_line_colliding_benchmark<'a, M: Measurement>(group: &mut BenchmarkGroup<'a, M>) {
+fn circle_to_line_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
     let circle = Body::Circle(Circle {
         body: BaseBody {
             position: ZERO,
@@ -91,7 +91,7 @@ fn circle_to_line_colliding_benchmark<'a, M: Measurement>(group: &mut BenchmarkG
     }
 }
 
-fn circle_to_line_not_colliding_benchmark<'a, M: Measurement>(group: &mut BenchmarkGroup<'a, M>) {
+fn circle_to_line_not_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
     let circle = Body::Circle(Circle {
         body: BaseBody {
             position: ZERO,
