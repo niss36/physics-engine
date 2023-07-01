@@ -14,17 +14,10 @@ pub fn fast_collision_check(this: &DynamicBody, that: &DynamicBody) -> bool {
             square_distance < square_total_radius
         }
         (Rectangle(this), Rectangle(that)) => {
-            let (this_min_x, this_max_x, this_min_y, this_max_y) = this.get_min_max();
-            let (that_min_x, that_max_x, that_min_y, that_max_y) = that.get_min_max();
+            let this_bounding_volume = &this.to_bounding_volume();
+            let that_bounding_volume = &that.to_bounding_volume();
 
-            if this_max_x < that_min_x || this_min_x > that_max_x {
-                return false;
-            }
-            if this_max_y < that_min_y || this_min_y > that_max_y {
-                return false;
-            }
-
-            true
+            this_bounding_volume.is_intersecting(that_bounding_volume)
         }
         (Circle(_), Rectangle(_)) => true, // todo
         (Rectangle(_), Circle(_)) => true, // todo
