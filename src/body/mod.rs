@@ -9,14 +9,14 @@ pub use line::*;
 pub use rectangle::*;
 
 #[derive(Debug, Clone, Copy)]
-pub enum Body {
+pub enum DynamicBody {
     Circle(Circle),
     Line(Line),
     Rectangle(Rectangle),
 }
 
-impl AsRef<BaseBody> for Body {
-    fn as_ref(&self) -> &BaseBody {
+impl AsRef<BaseDynamicBody> for DynamicBody {
+    fn as_ref(&self) -> &BaseDynamicBody {
         match self {
             Self::Circle(circle) => circle.as_ref(),
             Self::Line(line) => line.as_ref(),
@@ -25,8 +25,8 @@ impl AsRef<BaseBody> for Body {
     }
 }
 
-impl AsMut<BaseBody> for Body {
-    fn as_mut(&mut self) -> &mut BaseBody {
+impl AsMut<BaseDynamicBody> for DynamicBody {
+    fn as_mut(&mut self) -> &mut BaseDynamicBody {
         match self {
             Self::Circle(circle) => circle.as_mut(),
             Self::Line(line) => line.as_mut(),

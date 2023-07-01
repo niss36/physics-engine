@@ -1,9 +1,9 @@
-use super::BaseBody;
+use super::BaseDynamicBody;
 use crate::vec2::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Line {
-    pub body: BaseBody,
+    pub body: BaseDynamicBody,
     pub normal: Vec2D,
     pub origin_distance: f64,
 }
@@ -11,7 +11,7 @@ pub struct Line {
 impl Line {
     pub fn new(normal: Vec2D, origin_distance: f64) -> Self {
         Self {
-            body: BaseBody {
+            body: BaseDynamicBody {
                 position: &normal * (-origin_distance / normal.length()),
                 velocity: ZERO,
                 coefficient_of_restitution: 1.,
@@ -23,14 +23,14 @@ impl Line {
     }
 }
 
-impl AsRef<BaseBody> for Line {
-    fn as_ref(&self) -> &BaseBody {
+impl AsRef<BaseDynamicBody> for Line {
+    fn as_ref(&self) -> &BaseDynamicBody {
         &self.body
     }
 }
 
-impl AsMut<BaseBody> for Line {
-    fn as_mut(&mut self) -> &mut BaseBody {
+impl AsMut<BaseDynamicBody> for Line {
+    fn as_mut(&mut self) -> &mut BaseDynamicBody {
         &mut self.body
     }
 }

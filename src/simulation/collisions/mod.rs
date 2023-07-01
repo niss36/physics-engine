@@ -1,8 +1,8 @@
 use crate::body::*;
 use crate::vec2::*;
 
-pub fn fast_collision_check(this: &Body, that: &Body) -> bool {
-    use Body::*;
+pub fn fast_collision_check(this: &DynamicBody, that: &DynamicBody) -> bool {
+    use DynamicBody::*;
 
     match (this, that) {
         (Circle(this), Circle(that)) => {
@@ -50,8 +50,8 @@ impl Contact {
     }
 }
 
-pub fn generate_contact(this: &Body, that: &Body) -> Option<Contact> {
-    use Body::*;
+pub fn generate_contact(this: &DynamicBody, that: &DynamicBody) -> Option<Contact> {
+    use DynamicBody::*;
 
     match (this, that) {
         (Circle(this), Circle(that)) => Some(contacts::circle_circle(this, that)),

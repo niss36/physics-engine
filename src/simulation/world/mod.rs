@@ -6,7 +6,7 @@ use crate::vec2::*;
 
 #[derive(Debug, Clone)]
 pub struct World {
-    pub bodies: Vec<Body>,
+    pub dynamic_bodies: Vec<DynamicBody>,
     pub gravity: Vec2D,
 }
 
@@ -15,9 +15,9 @@ impl World {
         let gravity = &self.gravity * elapsed;
 
         let bodies_with_mass = self
-            .bodies
+            .dynamic_bodies
             .iter_mut()
-            .map(Body::as_mut)
+            .map(DynamicBody::as_mut)
             .filter(|body| body.inverse_mass > 0.);
 
         for body in bodies_with_mass {
@@ -26,9 +26,9 @@ impl World {
     }
 
     fn handle_collisions(&mut self) {
-        let num_bodies = self.bodies.len();
+        let num_bodies = self.dynamic_bodies.len();
         for i in 0..num_bodies {
-            let (head, tail) = self.bodies.split_at_mut(i + 1);
+            let (head, tail) = self.dynamic_bodies.split_at_mut(i + 1);
             let this = &mut head[i];
 
             for that in tail {
@@ -38,7 +38,7 @@ impl World {
     }
 
     fn integrate_bodies(&mut self, elapsed: f64) {
-        for body in self.bodies.iter_mut() {
+        for body in self.dynamic_bodies.iter_mut() {
             body.as_mut().integrate(elapsed);
         }
     }
@@ -50,7 +50,7 @@ impl World {
     }
 }
 
-fn handle_collision(this: &mut Body, that: &mut Body) {
+fn handle_collision(this: &mut DynamicBody, that: &mut DynamicBody) {
     if !fast_collision_check(this, that) {
         return;
     }
@@ -69,7 +69,11 @@ fn handle_collision(this: &mut Body, that: &mut Body) {
     apply_correction(this_body, that_body, &contact);
 }
 
-fn apply_impulse(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &Contact) {
+fn apply_impulse(
+    this_body: &mut BaseDynamicBody,
+    that_body: &mut BaseDynamicBody,
+    contact: &Contact,
+) {
     let relative_velocity = &that_body.velocity - &this_body.velocity;
     let relative_velocity_dot_normal = relative_velocity.dot_product(&contact.normal);
 
@@ -94,7 +98,11 @@ fn apply_impulse(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &C
 const CORRECTION_THRESHOLD: f64 = 0.05;
 const CORRECTION_PERCENTAGE: f64 = 0.4;
 
-fn apply_correction(this_body: &mut BaseBody, that_body: &mut BaseBody, contact: &Contact) {
+fn apply_correction(
+    this_body: &mut BaseDynamicBody,
+    that_body: &mut BaseDynamicBody,
+    contact: &Contact,
+) {
     let correction_amount = (contact.distance + CORRECTION_THRESHOLD).min(0.)
         * CORRECTION_PERCENTAGE
         / (this_body.inverse_mass + that_body.inverse_mass);

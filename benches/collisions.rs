@@ -13,8 +13,8 @@ fn generate_contact_benchmark(c: &mut Criterion) {
 }
 
 fn circle_to_circle_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
-    let circle_1 = Body::Circle(Circle {
-        body: BaseBody {
+    let circle_1 = DynamicBody::Circle(Circle {
+        body: BaseDynamicBody {
             position: ZERO,
             velocity: ZERO,
             coefficient_of_restitution: 0.,
@@ -23,8 +23,8 @@ fn circle_to_circle_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGro
         radius: 5.,
     });
 
-    let circle_2 = Body::Circle(Circle {
-        body: BaseBody {
+    let circle_2 = DynamicBody::Circle(Circle {
+        body: BaseDynamicBody {
             position: UNIT_RIGHT,
             velocity: ZERO,
             coefficient_of_restitution: 0.,
@@ -41,8 +41,8 @@ fn circle_to_circle_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGro
 }
 
 fn circle_to_circle_not_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
-    let circle_1 = Body::Circle(Circle {
-        body: BaseBody {
+    let circle_1 = DynamicBody::Circle(Circle {
+        body: BaseDynamicBody {
             position: ZERO,
             velocity: ZERO,
             coefficient_of_restitution: 0.,
@@ -51,8 +51,8 @@ fn circle_to_circle_not_colliding_benchmark<M: Measurement>(group: &mut Benchmar
         radius: 5.,
     });
 
-    let circle_2 = Body::Circle(Circle {
-        body: BaseBody {
+    let circle_2 = DynamicBody::Circle(Circle {
+        body: BaseDynamicBody {
             position: Vec2D { x: 10., y: 10. },
             velocity: ZERO,
             coefficient_of_restitution: 0.,
@@ -69,8 +69,8 @@ fn circle_to_circle_not_colliding_benchmark<M: Measurement>(group: &mut Benchmar
 }
 
 fn circle_to_line_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
-    let circle = Body::Circle(Circle {
-        body: BaseBody {
+    let circle = DynamicBody::Circle(Circle {
+        body: BaseDynamicBody {
             position: ZERO,
             velocity: ZERO,
             coefficient_of_restitution: 0.,
@@ -79,7 +79,7 @@ fn circle_to_line_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup
         radius: 5.,
     });
 
-    let line = Body::Line(Line::new(UNIT_RIGHT, 3.));
+    let line = DynamicBody::Line(Line::new(UNIT_RIGHT, 3.));
 
     for (input, id) in [
         (&(circle, line), "circle to line (colliding)"),
@@ -92,8 +92,8 @@ fn circle_to_line_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup
 }
 
 fn circle_to_line_not_colliding_benchmark<M: Measurement>(group: &mut BenchmarkGroup<'_, M>) {
-    let circle = Body::Circle(Circle {
-        body: BaseBody {
+    let circle = DynamicBody::Circle(Circle {
+        body: BaseDynamicBody {
             position: ZERO,
             velocity: ZERO,
             coefficient_of_restitution: 0.,
@@ -102,7 +102,7 @@ fn circle_to_line_not_colliding_benchmark<M: Measurement>(group: &mut BenchmarkG
         radius: 5.,
     });
 
-    let line = Body::Line(Line::new(UNIT_RIGHT, 10.));
+    let line = DynamicBody::Line(Line::new(UNIT_RIGHT, 10.));
 
     for (input, id) in [
         (&(circle, line), "circle to line (not colliding)"),

@@ -1,8 +1,8 @@
-use super::BaseBody;
+use super::BaseDynamicBody;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Rectangle {
-    pub body: BaseBody,
+    pub body: BaseDynamicBody,
     pub half_width: f64,
     pub half_height: f64,
 }
@@ -20,14 +20,14 @@ impl Rectangle {
     }
 }
 
-impl AsRef<BaseBody> for Rectangle {
-    fn as_ref(&self) -> &BaseBody {
+impl AsRef<BaseDynamicBody> for Rectangle {
+    fn as_ref(&self) -> &BaseDynamicBody {
         &self.body
     }
 }
 
-impl AsMut<BaseBody> for Rectangle {
-    fn as_mut(&mut self) -> &mut BaseBody {
+impl AsMut<BaseDynamicBody> for Rectangle {
+    fn as_mut(&mut self) -> &mut BaseDynamicBody {
         &mut self.body
     }
 }

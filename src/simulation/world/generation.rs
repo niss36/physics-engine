@@ -20,7 +20,7 @@ fn random_velocity() -> Vec2D {
     }
 }
 
-fn random_base_body(width: f64, height: f64, offset: f64) -> BaseBody {
+fn random_base_dynamic_body(width: f64, height: f64, offset: f64) -> BaseDynamicBody {
     let position = random_position(width, height, offset);
 
     let velocity = random_velocity();
@@ -29,7 +29,7 @@ fn random_base_body(width: f64, height: f64, offset: f64) -> BaseBody {
 
     let mass = gen_range(0., 1.) + 0.000001;
 
-    BaseBody {
+    BaseDynamicBody {
         position,
         velocity,
         coefficient_of_restitution,
@@ -40,7 +40,7 @@ fn random_base_body(width: f64, height: f64, offset: f64) -> BaseBody {
 const SIZE_TO_MASS_RATIO: f64 = 10.;
 
 fn random_circle(width: f64, height: f64, offset: f64) -> Circle {
-    let body = random_base_body(width, height, offset);
+    let body = random_base_dynamic_body(width, height, offset);
 
     Circle {
         body,
@@ -49,7 +49,7 @@ fn random_circle(width: f64, height: f64, offset: f64) -> Circle {
 }
 
 fn random_rectangle(width: f64, height: f64, offset: f64) -> Rectangle {
-    let body = random_base_body(width, height, offset);
+    let body = random_base_dynamic_body(width, height, offset);
 
     let aspect_ratio = gen_range(0.25, 0.75);
 
@@ -70,22 +70,23 @@ impl World {
         let bottom_border = Line::new(UNIT_UP, height - 1. - offset);
         let left_border = Line::new(UNIT_RIGHT, -offset);
 
-        let mut bodies: Vec<_> = [top_border, right_border, bottom_border, left_border]
+        let mut dynamic_bodies: Vec<_> = [top_border, right_border, bottom_border, left_border]
             .into_iter()
-            .map(Body::Line)
+            .map(DynamicBody::Line)
             .collect();
 
-        let circles = (0..num_bodies).map(|_| Body::Circle(random_circle(width, height, offset)));
+        let circles =
+            (0..num_bodies).map(|_| DynamicBody::Circle(random_circle(width, height, offset)));
 
-        bodies.extend(circles);
+        dynamic_bodies.extend(circles);
 
-        let rectangles =
-            (0..num_bodies).map(|_| Body::Rectangle(random_rectangle(width, height, offset)));
+        let rectangles = (0..num_bodies)
+            .map(|_| DynamicBody::Rectangle(random_rectangle(width, height, offset)));
 
-        bodies.extend(rectangles);
+        dynamic_bodies.extend(rectangles);
 
         Self {
-            bodies,
+            dynamic_bodies,
             gravity: Vec2D { x: 0., y: 0. },
         }
     }
