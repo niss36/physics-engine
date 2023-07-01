@@ -65,15 +65,29 @@ fn random_rectangle(width: f64, height: f64, offset: f64) -> Rectangle {
 
 impl World {
     pub fn generate(width: f64, height: f64, offset: f64, num_bodies: u32) -> Self {
-        let top_border = Line::new(UNIT_DOWN, -offset);
-        let right_border = Line::new(UNIT_LEFT, width - 1. - offset);
-        let bottom_border = Line::new(UNIT_UP, height - 1. - offset);
-        let left_border = Line::new(UNIT_RIGHT, -offset);
+        let top_border = Line {
+            normal: UNIT_DOWN,
+            origin_distance: -offset,
+        };
+        let right_border = Line {
+            normal: UNIT_LEFT,
+            origin_distance: width - 1. - offset,
+        };
+        let bottom_border = Line {
+            normal: UNIT_UP,
+            origin_distance: height - 1. - offset,
+        };
+        let left_border = Line {
+            normal: UNIT_RIGHT,
+            origin_distance: -offset,
+        };
 
-        let mut dynamic_bodies: Vec<_> = [top_border, right_border, bottom_border, left_border]
+        let static_bodies: Vec<_> = [top_border, right_border, bottom_border, left_border]
             .into_iter()
-            .map(DynamicBody::Line)
+            .map(StaticBody::Line)
             .collect();
+
+        let mut dynamic_bodies = vec![];
 
         let circles =
             (0..num_bodies).map(|_| DynamicBody::Circle(random_circle(width, height, offset)));
@@ -86,6 +100,7 @@ impl World {
         dynamic_bodies.extend(rectangles);
 
         Self {
+            static_bodies,
             dynamic_bodies,
             gravity: Vec2D { x: 0., y: 0. },
         }

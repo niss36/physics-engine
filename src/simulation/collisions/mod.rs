@@ -28,11 +28,6 @@ pub fn fast_collision_check(this: &DynamicBody, that: &DynamicBody) -> bool {
         }
         (Circle(_), Rectangle(_)) => true, // todo
         (Rectangle(_), Circle(_)) => true, // todo
-        (Circle(_), Line(_)) => true,
-        (Line(_), Circle(_)) => true,
-        (Rectangle(_), Line(_)) => true,
-        (Line(_), Rectangle(_)) => true,
-        (Line(_), Line(_)) => false,
     }
 }
 
@@ -50,7 +45,18 @@ impl Contact {
     }
 }
 
-pub fn generate_contact(this: &DynamicBody, that: &DynamicBody) -> Option<Contact> {
+pub fn generate_contact_static(this: &StaticBody, that: &DynamicBody) -> Option<Contact> {
+    match (this, that) {
+        (StaticBody::Line(this), DynamicBody::Circle(that)) => {
+            Some(contacts::line_circle(this, that))
+        }
+        (StaticBody::Line(this), DynamicBody::Rectangle(that)) => {
+            Some(contacts::line_rectangle(this, that))
+        }
+    }
+}
+
+pub fn generate_contact_dynamic(this: &DynamicBody, that: &DynamicBody) -> Option<Contact> {
     use DynamicBody::*;
 
     match (this, that) {
@@ -58,11 +64,6 @@ pub fn generate_contact(this: &DynamicBody, that: &DynamicBody) -> Option<Contac
         (Rectangle(this), Rectangle(that)) => contacts::rectangle_rectangle(this, that),
         (Circle(this), Rectangle(that)) => Some(contacts::circle_rectangle(this, that)),
         (Rectangle(this), Circle(that)) => Some(contacts::circle_rectangle(that, this).flip()),
-        (Circle(this), Line(that)) => Some(contacts::line_circle(that, this).flip()),
-        (Line(this), Circle(that)) => Some(contacts::line_circle(this, that)),
-        (Rectangle(this), Line(that)) => Some(contacts::line_rectangle(that, this).flip()),
-        (Line(this), Rectangle(that)) => Some(contacts::line_rectangle(this, that)),
-        (Line(_), Line(_)) => None,
     }
 }
 
