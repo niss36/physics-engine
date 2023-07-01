@@ -5,6 +5,14 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+bench = false
+
+[[bin]]
+name = "physics-engine"
+path = "src/main.rs"
+bench = false
+
 [dependencies]
 macroquad = "0.3"
 
