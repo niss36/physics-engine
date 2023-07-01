@@ -95,6 +95,7 @@ async fn main() {
         }
 
         accumulator += get_frame_time();
+        accumulator = accumulator.min(TIME_BETWEEN_TICKS * 5.);
 
         let mut ticks_per_frame = 0;
 
