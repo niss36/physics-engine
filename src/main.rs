@@ -21,21 +21,41 @@ fn generate_world() -> World {
     World::generate(screen_width() as f64, screen_height() as f64, 10., 500)
 }
 
+#[derive(Debug)]
+struct IncrementalStatistics {
+    n_samples: u64,
+    average: f64,
+}
+
+impl IncrementalStatistics {
+    fn new() -> Self {
+        Self {
+            n_samples: 0,
+            average: 0.,
+        }
+    }
+
+    fn add_measurement(&mut self, measurement: f64) {
+        self.average += (measurement - self.average) / ((self.n_samples + 1) as f64);
+        self.n_samples += 1;
+    }
+}
+
 #[macroquad::main(window_conf)]
 async fn main() {
     let mut world = generate_world();
     let mut accumulator = 0.;
 
-    let mut average_tick = 0.;
-    let mut n_tick = 0;
+    let mut tick_statistics = IncrementalStatistics::new();
+    let mut render_statistics = IncrementalStatistics::new();
 
     loop {
         if is_key_released(KeyCode::R) {
             world = generate_world();
             accumulator = 0.;
 
-            average_tick = 0.;
-            n_tick = 0;
+            tick_statistics = IncrementalStatistics::new();
+            render_statistics = IncrementalStatistics::new();
         }
 
         if is_key_released(KeyCode::Key1) {
@@ -85,15 +105,19 @@ async fn main() {
             world.tick(TIME_BETWEEN_TICKS as f64);
             let elapsed_tick = get_time() - before_tick;
 
-            average_tick = (elapsed_tick + (n_tick as f64) * average_tick) / ((n_tick + 1) as f64);
-            n_tick += 1;
+            tick_statistics.add_measurement(elapsed_tick);
 
             ticks_per_frame += 1;
         }
 
         clear_background(WHITE);
 
+        let before_render = get_time();
         render_world(&world);
+        let elapsed_render = get_time() - before_render;
+
+        render_statistics.add_measurement(elapsed_render);
+
         draw_text(format!("{} FPS", get_fps()).as_str(), 10., 10., 16., RED);
         draw_text(
             format!("{ticks_per_frame} ticks per frame").as_str(),
@@ -103,9 +127,16 @@ async fn main() {
             RED,
         );
         draw_text(
-            format!("{:.0} ns tick", average_tick * 1_000_000_000.).as_str(),
+            format!("{:.3} ms tick", tick_statistics.average * 1_000.).as_str(),
             10.,
             50.,
+            16.,
+            RED,
+        );
+        draw_text(
+            format!("{:.3} ms render", render_statistics.average * 1_000.).as_str(),
+            10.,
+            70.,
             16.,
             RED,
         );
