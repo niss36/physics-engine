@@ -34,6 +34,20 @@ impl Vec2D {
         }
     }
 
+    pub fn min(&self, other: &Self) -> Self {
+        Vec2D {
+            x: self.x.min(other.x),
+            y: self.y.min(other.y),
+        }
+    }
+
+    pub fn max(&self, other: &Self) -> Self {
+        Vec2D {
+            x: self.x.max(other.x),
+            y: self.y.max(other.y),
+        }
+    }
+
     pub fn clamp(&self, min: &Vec2D, max: &Vec2D) -> Vec2D {
         Vec2D {
             x: self.x.clamp(min.x, max.x),
