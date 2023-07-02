@@ -22,21 +22,24 @@ impl World {
     }
 
     fn detect_dynamic_collisions(&self) -> Vec<(Contact, usize, usize)> {
-        let bounding_volumes: Vec<_> = self
+        let mut bounding_volumes: Vec<_> = self
             .dynamic_bodies
             .iter()
             .enumerate()
             .map(|(index, body)| (index, body.to_bounding_volume()))
             .collect();
 
-        let Some(bvh) = BoundingVolumeHierarchyTree::new(bounding_volumes.as_slice()) else {
+        let Some(bvh) = BoundingVolumeHierarchyTree::new(&mut bounding_volumes) else {
             return vec![];
         };
 
         let mut contacts: Vec<(Contact, usize, usize)> = vec![];
 
-        for (i, this) in self.dynamic_bodies.iter().enumerate() {
-            for j in bvh.get_overlapping_bodies(&bounding_volumes[i].1) {
+        for (i, bounding_volume) in &bounding_volumes {
+            let i = *i;
+            let this = &self.dynamic_bodies[i];
+
+            for j in bvh.get_overlapping_bodies(bounding_volume) {
                 if j <= i {
                     continue;
                 }
@@ -177,16 +180,16 @@ enum BoundingVolumeHierarchyTree {
 }
 
 impl BoundingVolumeHierarchyTree {
-    fn new(bounding_volumes: &[(usize, BoundingVolume)]) -> Option<Self> {
+    fn new(bounding_volumes: &mut [(usize, BoundingVolume)]) -> Option<Self> {
         match bounding_volumes {
             [] => None,
             [(index, bounding_volume)] => {
                 Some(BoundingVolumeHierarchyTree::Leaf(*bounding_volume, *index))
             }
-            [(_, bounding_volume), remaining_bodies @ ..] => {
-                let overall_bounding_volume = remaining_bodies
+            [(_, first_volume), other_volumes @ ..] => {
+                let overall_bounding_volume = other_volumes
                     .iter()
-                    .fold(*bounding_volume, |accumulator, (_, bounding_volume)| {
+                    .fold(*first_volume, |accumulator, (_, bounding_volume)| {
                         accumulator.union(bounding_volume)
                     });
 
@@ -203,10 +206,11 @@ impl BoundingVolumeHierarchyTree {
                     (min_y + max_y) / 2.
                 };
 
-                let mut left_bounding_volumes = vec![];
-                let mut right_bounding_volumes = vec![];
+                let mut split_index = 0;
 
-                for &(index, bounding_volume) in bounding_volumes {
+                for i in 0..bounding_volumes.len() {
+                    let bounding_volume = bounding_volumes[i].1;
+
                     let volume_mid_point = if is_main_axis_x {
                         (bounding_volume.top_left.x + bounding_volume.bottom_right.x) / 2.
                     } else {
@@ -214,26 +218,21 @@ impl BoundingVolumeHierarchyTree {
                     };
 
                     if volume_mid_point < overall_mid_point {
-                        left_bounding_volumes.push((index, bounding_volume));
-                    } else {
-                        right_bounding_volumes.push((index, bounding_volume));
+                        bounding_volumes.swap(i, split_index);
+                        split_index += 1;
                     }
                 }
 
                 let threshold = 1.max(bounding_volumes.len() / 16);
+                split_index = split_index.clamp(threshold, bounding_volumes.len() - threshold);
 
-                while left_bounding_volumes.len() < threshold {
-                    left_bounding_volumes.push(right_bounding_volumes.pop()?);
-                }
-
-                while right_bounding_volumes.len() < threshold {
-                    right_bounding_volumes.push(left_bounding_volumes.pop()?);
-                }
+                let (left_bounding_volumes, right_bounding_volumes) =
+                    bounding_volumes.split_at_mut(split_index);
 
                 Some(Self::Node(
                     overall_bounding_volume,
-                    Box::new(Self::new(left_bounding_volumes.as_slice())?),
-                    Box::new(Self::new(right_bounding_volumes.as_slice())?),
+                    Box::new(Self::new(left_bounding_volumes)?),
+                    Box::new(Self::new(right_bounding_volumes)?),
                 ))
             }
         }
@@ -289,9 +288,10 @@ mod tests {
         let bv3 = create_square(Vec2D { x: 20., y: 20. }, 10.);
         let bv4 = create_square(Vec2D { x: 0., y: 20. }, 10.);
 
-        let bounding_volumes: Vec<_> = vec![bv1, bv2, bv3, bv4].into_iter().enumerate().collect();
+        let mut bounding_volumes: Vec<_> =
+            vec![bv1, bv2, bv3, bv4].into_iter().enumerate().collect();
 
-        let bvh = BoundingVolumeHierarchyTree::new(&bounding_volumes);
+        let bvh = BoundingVolumeHierarchyTree::new(&mut bounding_volumes);
 
         use BoundingVolumeHierarchyTree::{Leaf, Node};
 
