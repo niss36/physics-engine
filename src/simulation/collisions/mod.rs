@@ -1,50 +1,25 @@
 use crate::body::*;
 use crate::vec2::*;
 
-pub fn fast_collision_check(this: &DynamicBody, that: &DynamicBody) -> bool {
-    use DynamicBody::*;
-
-    match (this, that) {
-        (Circle(this), Circle(that)) => {
-            let this_to_that = &that.body.position - &this.body.position;
-
-            let square_distance = this_to_that.length_squared();
-            let square_total_radius = (this.radius + that.radius).powi(2);
-
-            square_distance < square_total_radius
-        }
-        (Rectangle(this), Rectangle(that)) => {
-            let this_bounding_volume = &this.to_bounding_volume();
-            let that_bounding_volume = &that.to_bounding_volume();
-
-            this_bounding_volume.is_intersecting(that_bounding_volume)
-        }
-        (Circle(_), Rectangle(_)) => true, // todo
-        (Rectangle(_), Circle(_)) => true, // todo
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Contact {
     pub normal: Vec2D,
     pub distance: f64,
 }
 
 impl Contact {
-    fn flip(mut self) -> Self {
+    pub fn flip(mut self) -> Self {
         self.normal = -self.normal;
 
         self
     }
 }
 
-pub fn generate_contact_static(this: &StaticBody, that: &DynamicBody) -> Option<Contact> {
+pub fn generate_contact_static(this: &StaticBody, that: &DynamicBody) -> Contact {
     match (this, that) {
-        (StaticBody::Line(this), DynamicBody::Circle(that)) => {
-            Some(contacts::line_circle(this, that))
-        }
+        (StaticBody::Line(this), DynamicBody::Circle(that)) => contacts::line_circle(this, that),
         (StaticBody::Line(this), DynamicBody::Rectangle(that)) => {
-            Some(contacts::line_rectangle(this, that))
+            contacts::line_rectangle(this, that)
         }
     }
 }
