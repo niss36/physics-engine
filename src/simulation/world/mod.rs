@@ -46,7 +46,9 @@ impl World {
 
                 let that = &self.dynamic_bodies[j];
 
-                let Some(contact) = generate_contact_dynamic(this, that) else { continue; };
+                let Some(contact) = generate_contact_dynamic(this, that) else {
+                    continue;
+                };
 
                 if contact.distance >= 0. {
                     continue;
