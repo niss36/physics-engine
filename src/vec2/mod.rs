@@ -1,7 +1,5 @@
 mod arithmetic;
 
-pub use arithmetic::*;
-
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec2D {
     pub x: f64,
