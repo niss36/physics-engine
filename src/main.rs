@@ -141,6 +141,13 @@ async fn main() {
             16.,
             RED,
         );
+        draw_text(
+            format!("{} bodies", world.dynamic_bodies.len()).as_str(),
+            10.,
+            90.,
+            16.,
+            RED,
+        );
 
         next_frame().await
     }
