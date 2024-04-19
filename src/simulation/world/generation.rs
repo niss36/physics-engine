@@ -64,7 +64,7 @@ fn random_rectangle(width: f64, height: f64, offset: f64) -> Rectangle {
 }
 
 impl World {
-    pub fn generate(width: f64, height: f64, offset: f64, num_bodies: u32) -> Self {
+    pub fn generate(width: f64, height: f64, offset: f64, num_bodies: u32, gravity: Vec2D) -> Self {
         let top_border = Line {
             normal: UNIT_DOWN,
             origin_distance: -offset,
@@ -102,7 +102,7 @@ impl World {
         Self {
             static_bodies,
             dynamic_bodies,
-            gravity: Vec2D { x: 0., y: 0. },
+            gravity,
         }
     }
 }
