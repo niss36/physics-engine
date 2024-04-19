@@ -1,4 +1,4 @@
-use physics_engine::{rendering::*, simulation::world::World, vec2::{Vec2D, ZERO}};
+use physics_engine::{rendering::*, simulation::world::World, vec2::Vec2D};
 
 use macroquad::prelude::*;
 
@@ -18,7 +18,13 @@ fn window_conf() -> Conf {
 const TIME_BETWEEN_TICKS: f32 = 10. / 1_000.;
 
 fn generate_world() -> World {
-    World::generate(screen_width() as f64, screen_height() as f64, 10., 500, ZERO)
+    World::generate(
+        screen_width() as f64,
+        screen_height() as f64,
+        10.,
+        500,
+        Vec2D { x: 0., y: 100. },
+    )
 }
 
 #[derive(Debug)]
