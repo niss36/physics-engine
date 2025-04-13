@@ -1,7 +1,7 @@
 use super::Vec2D;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-impl<'a, 'b> Add<&'b Vec2D> for &'a Vec2D {
+impl<'b> Add<&'b Vec2D> for &Vec2D {
     type Output = Vec2D;
 
     fn add(self, rhs: &'b Vec2D) -> Self::Output {
@@ -19,7 +19,7 @@ impl AddAssign<&Vec2D> for Vec2D {
     }
 }
 
-impl<'a, 'b> Sub<&'b Vec2D> for &'a Vec2D {
+impl<'b> Sub<&'b Vec2D> for &Vec2D {
     type Output = Vec2D;
 
     fn sub(self, rhs: &'b Vec2D) -> Self::Output {
