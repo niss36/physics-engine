@@ -1,4 +1,4 @@
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use physics_engine::{simulation::world::*, vec2::ZERO};
 
 fn world_tick_benchmark(c: &mut Criterion) {
